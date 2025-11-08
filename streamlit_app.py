@@ -106,13 +106,19 @@ def initialize_agent():
             files = st.session_state.s3_loader.list_files()
             st.session_state.available_files = files
 
+        # Download all files from S3 to local cache
+        with st.spinner("📥 Downloading files from S3..."):
+            local_files = st.session_state.s3_loader.download_all_files()
+            logger.info(f"Downloaded {len(local_files)} files to local cache")
+
         # Initialize Bedrock agent
         with st.spinner("🤖 Initializing AI Agent..."):
             st.session_state.agent = BedrockAgent(
                 aws_region=bedrock_region,
                 model_id=bedrock_model
             )
-            st.session_state.agent.set_available_files(files)
+            # Set the local file paths for the agent
+            st.session_state.agent.set_available_files(local_files)
 
         st.session_state.initialized = True
         return True
@@ -146,10 +152,13 @@ def display_sidebar():
             st.text("No files found")
         
         if st.button("🔄 Refresh Files", use_container_width=True):
-            with st.spinner("Refreshing..."):
+            with st.spinner("Refreshing and downloading..."):
                 files = st.session_state.s3_loader.list_files()
                 st.session_state.available_files = files
-                st.session_state.agent.set_available_files(files)
+                # Download all files
+                local_files = st.session_state.s3_loader.download_all_files()
+                st.session_state.agent.set_available_files(local_files)
+                st.success(f"✅ Downloaded {len(local_files)} files")
                 st.rerun()
         
         st.markdown("---")
