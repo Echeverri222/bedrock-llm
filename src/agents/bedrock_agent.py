@@ -189,7 +189,7 @@ class BedrockAgent:
             logger.error(f"Error executing function {function_name}: {str(e)}")
             return json.dumps({"success": False, "error": str(e)})
     
-    def chat(self, user_message: str, max_iterations: int = 5) -> str:
+    def chat(self, user_message: str, max_iterations: int = 10) -> str:
         """
         Chat with the Bedrock agent, allowing multiple function calls if needed
         
@@ -233,8 +233,15 @@ IMPORTANT: Treat all data as confidential medical information. Focus on data ana
         else:
             system_prompt = None
         
-        # Build messages for Converse API
-        messages = self.conversation_history + [{
+        # Build messages for Converse API - start fresh with only complete conversation
+        # Filter out any dangling tool results from history
+        clean_history = []
+        for msg in self.conversation_history:
+            # Only keep assistant messages in history (user messages will be added fresh)
+            if msg.get('role') == 'assistant':
+                clean_history.append(msg)
+        
+        messages = clean_history + [{
             "role": "user",
             "content": [{"text": user_message}]
         }]
@@ -275,10 +282,15 @@ IMPORTANT: Treat all data as confidential medical information. Focus on data ana
             
             if stop_reason == 'end_turn':
                 # No tool use, return the text response
+                text_response = ""
                 for content in output_message['content']:
                     if 'text' in content:
-                        self.conversation_history = messages
-                        return content['text']
+                        text_response = content['text']
+                
+                if text_response:
+                    # Save only the assistant messages (no tool results)
+                    self.conversation_history.append(output_message)
+                    return text_response
                 return "I couldn't generate a response."
             
             elif stop_reason == 'tool_use':
@@ -314,14 +326,23 @@ IMPORTANT: Treat all data as confidential medical information. Focus on data ana
                 # Continue loop to get final response
                 continue
             
+            elif stop_reason == 'max_tokens':
+                # Max tokens reached, save and return
+                text_response = ""
+                for content in output_message['content']:
+                    if 'text' in content:
+                        text_response = content['text']
+                self.conversation_history.append(output_message)
+                return text_response or "Response was cut off due to length. Please ask a more specific question."
+            
             else:
                 # Other stop reasons
-                self.conversation_history = messages
+                logger.warning(f"Unexpected stop reason: {stop_reason}")
                 return f"Conversation stopped: {stop_reason}"
         
-        # Max iterations reached
-        self.conversation_history = messages
-        return "I've analyzed the data but reached the maximum number of tool calls. Please try rephrasing your question."
+        # Max iterations reached - still return any partial response
+        logger.warning(f"Max iterations ({max_iterations}) reached")
+        return "I've made multiple tool calls but need to continue. Please ask your question again or rephrase it."
     
     def reset_conversation(self):
         """Reset the conversation history"""
