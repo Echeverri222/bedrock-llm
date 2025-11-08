@@ -2,12 +2,15 @@ version: '3.8'
 
 services:
   llm-agent:
-    build: .
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     container_name: llm_data_agent
     env_file:
-      - .env
+      - ../.env
     volumes:
-      - ./data:/app/data
+      - ../data:/app/data
+      - ../src:/app/src
     stdin_open: true
     tty: true
     restart: unless-stopped

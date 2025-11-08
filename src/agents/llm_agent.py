@@ -8,7 +8,13 @@ import httpx
 from typing import List, Dict, Any, Optional
 import json
 import logging
-from file_tools import FileTools
+import sys
+from pathlib import Path
+
+# Add parent directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from tools.file_tools import FileTools
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

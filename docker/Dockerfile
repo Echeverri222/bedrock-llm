@@ -27,6 +27,9 @@ COPY . .
 # Create data directory for S3 cache
 RUN mkdir -p /app/data
 
+# Set Python path
+ENV PYTHONPATH=/app/src
+
 # Run the application
-CMD ["python", "main.py"]
+CMD ["python", "src/main.py"]
 

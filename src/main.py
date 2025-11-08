@@ -4,10 +4,16 @@ LLM Agent that analyzes data from S3 bucket
 """
 
 import os
+import sys
+from pathlib import Path
 from dotenv import load_dotenv
-from s3_loader import S3DataLoader
-from bedrock_agent import BedrockAgent
 import logging
+
+# Add src directory to path
+sys.path.insert(0, str(Path(__file__).parent))
+
+from tools.s3_loader import S3DataLoader
+from agents.bedrock_agent import BedrockAgent
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)

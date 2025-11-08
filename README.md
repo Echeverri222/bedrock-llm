@@ -73,8 +73,16 @@ pip install -r requirements.txt
 
 ### 4. Run the Application
 
+**Easy way (recommended):**
 ```bash
-python main.py
+./run.sh              # Mac/Linux
+run.bat               # Windows
+```
+
+**Manual way:**
+```bash
+source venv/bin/activate
+cd src && python main.py
 ```
 
 ## 🐳 Docker Deployment
@@ -82,13 +90,21 @@ python main.py
 ### Build and Run
 
 ```bash
+cd docker
 docker compose up --build
 ```
 
 ### Interactive Mode
 
 ```bash
-docker exec -it llm_data_agent python main.py
+docker exec -it llm_data_agent python src/main.py
+```
+
+### Or build from root:
+
+```bash
+docker build -f docker/Dockerfile -t bedrock-llm .
+docker run -it --env-file .env bedrock-llm
 ```
 
 ## 💬 Usage Examples
@@ -116,17 +132,27 @@ Agent: Based on the analysis... [summary]
 
 ```
 bedrock-llm/
-├── main.py                 # Main application entry point
-├── bedrock_agent.py        # AWS Bedrock agent with function calling
-├── llm_agent.py           # OpenAI agent (alternative)
-├── s3_loader.py           # S3 data loader
-├── file_tools.py          # Excel/JSON processing tools
-├── requirements.txt       # Python dependencies
-├── Dockerfile            # Docker configuration
-├── docker-compose.yml    # Docker Compose setup
-├── .env.example         # Environment variables template
-├── .gitignore          # Git ignore rules
-└── README.md          # This file
+├── src/                      # Source code
+│   ├── main.py              # Main application entry point
+│   ├── agents/              # AI agents
+│   │   ├── bedrock_agent.py # AWS Bedrock agent
+│   │   └── llm_agent.py     # OpenAI agent
+│   └── tools/               # Utility tools
+│       ├── s3_loader.py     # S3 data loader
+│       └── file_tools.py    # File processing
+├── docker/                   # Docker files
+│   ├── Dockerfile           # Docker configuration
+│   └── docker-compose.yml   # Docker Compose
+├── docs/                     # Documentation
+│   └── BEDROCK_SETUP.md     # Bedrock setup guide
+├── config/                   # Configuration files
+│   └── env.example          # Environment template
+├── data/                     # Data cache (auto-created)
+├── run.sh                    # Run script (Mac/Linux)
+├── run.bat                   # Run script (Windows)
+├── requirements.txt          # Python dependencies
+├── .gitignore               # Git ignore rules
+└── README.md                # This file
 ```
 
 ## 🔧 Available Tools
