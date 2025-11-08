@@ -74,18 +74,35 @@ def initialize_agent():
     """Initialize the Bedrock agent and S3 loader"""
     try:
         # Get environment variables
+        aws_access_key = os.getenv('AWS_ACCESS_KEY_ID')
+        aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
         aws_region = os.getenv('AWS_REGION', 'sa-east-1')
         bedrock_region = os.getenv('BEDROCK_REGION', 'us-east-1')
         bedrock_model = os.getenv('BEDROCK_MODEL', 'cohere.command-r-plus-v1:0')
         s3_bucket = os.getenv('S3_BUCKET_NAME')
 
+        # Validate required environment variables
+        missing_vars = []
+        if not aws_access_key:
+            missing_vars.append('AWS_ACCESS_KEY_ID')
+        if not aws_secret_key:
+            missing_vars.append('AWS_SECRET_ACCESS_KEY')
         if not s3_bucket:
-            st.error("⚠️ S3_BUCKET_NAME not configured. Please set environment variables.")
+            missing_vars.append('S3_BUCKET_NAME')
+        
+        if missing_vars:
+            st.error(f"⚠️ Missing environment variables: {', '.join(missing_vars)}")
+            st.info("💡 Please create a `.env` file with your AWS credentials. See `config/env.example` for reference.")
             st.stop()
 
         # Initialize S3 loader
         with st.spinner("🔄 Connecting to AWS S3..."):
-            st.session_state.s3_loader = S3DataLoader(s3_bucket, aws_region)
+            st.session_state.s3_loader = S3DataLoader(
+                bucket_name=s3_bucket,
+                aws_access_key_id=aws_access_key,
+                aws_secret_access_key=aws_secret_key,
+                region_name=aws_region
+            )
             files = st.session_state.s3_loader.list_files()
             st.session_state.available_files = files
 
