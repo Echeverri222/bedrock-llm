@@ -233,15 +233,10 @@ IMPORTANT: Treat all data as confidential medical information. Focus on data ana
         else:
             system_prompt = None
         
-        # Build messages for Converse API - start fresh with only complete conversation
-        # Filter out any dangling tool results from history
-        clean_history = []
-        for msg in self.conversation_history:
-            # Only keep assistant messages in history (user messages will be added fresh)
-            if msg.get('role') == 'assistant':
-                clean_history.append(msg)
-        
-        messages = clean_history + [{
+        # Build messages for Converse API
+        # For now, start fresh with each query to avoid conversation history issues
+        # This ensures we always start with a user message
+        messages = [{
             "role": "user",
             "content": [{"text": user_message}]
         }]
@@ -288,8 +283,8 @@ IMPORTANT: Treat all data as confidential medical information. Focus on data ana
                         text_response = content['text']
                 
                 if text_response:
-                    # Save only the assistant messages (no tool results)
-                    self.conversation_history.append(output_message)
+                    # Don't save to conversation_history for now to avoid API conflicts
+                    # Each query starts fresh with system prompt context
                     return text_response
                 return "I couldn't generate a response."
             
@@ -327,12 +322,11 @@ IMPORTANT: Treat all data as confidential medical information. Focus on data ana
                 continue
             
             elif stop_reason == 'max_tokens':
-                # Max tokens reached, save and return
+                # Max tokens reached
                 text_response = ""
                 for content in output_message['content']:
                     if 'text' in content:
                         text_response = content['text']
-                self.conversation_history.append(output_message)
                 return text_response or "Response was cut off due to length. Please ask a more specific question."
             
             else:
