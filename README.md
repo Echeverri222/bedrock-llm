@@ -2,15 +2,19 @@
 
 An intelligent AI agent that reads medical data from AWS S3 buckets and answers questions using AWS Bedrock (Cohere Command R+) with function calling capabilities.
 
+🌐 **Now available as a Web App!** Run with Streamlit for a beautiful browser interface.
+
 ## 🌟 Features
 
-- **Excel File Analysis**: Read and analyze Excel files from S3
-- **AWS Bedrock Integration**: Uses Cohere Command R+ with function calling
-- **AWS S3 Integration**: Automatically downloads and caches files
-- **Interactive Chat**: Natural language interface for data analysis
-- **Docker Ready**: Easy deployment with Docker
-- **Token Tracking**: Monitor usage and costs in real-time
-- **Medical Data Focus**: Specialized for Doppler ultrasound studies
+- 🌐 **Web Interface**: Beautiful Streamlit UI with chat interface
+- 📊 **Excel File Analysis**: Read and analyze Excel files from S3
+- 🤖 **AWS Bedrock Integration**: Uses Cohere Command R+ with function calling
+- ☁️ **AWS S3 Integration**: Automatically downloads and caches files
+- 💬 **Interactive Chat**: Natural language interface for data analysis
+- 🐳 **Docker Ready**: Easy deployment with Docker
+- 💰 **Token Tracking**: Monitor usage and costs in real-time
+- 🏥 **Medical Data Focus**: Specialized for Doppler ultrasound studies
+- 🎨 **Custom Theme**: Professional UI design
 
 ## 🏗️ Architecture
 
@@ -73,7 +77,26 @@ pip install -r requirements.txt
 
 ### 4. Run the Application
 
-**Easy way (recommended):**
+#### **🌐 Web Interface (Recommended!)**
+
+```bash
+streamlit run streamlit_app.py
+```
+
+Then open your browser to `http://localhost:8501` 
+
+**Features:**
+- ✨ Beautiful chat interface
+- 📊 Real-time token usage
+- 📁 View S3 files
+- 💬 Conversation history
+- 🔄 Easy reset
+
+---
+
+#### **💻 CLI Interface (Classic)**
+
+**Easy way:**
 ```bash
 ./run.sh              # Mac/Linux
 run.bat               # Windows
@@ -87,16 +110,21 @@ cd src && python main.py
 
 ## 🐳 Docker Deployment
 
-### Build and Run
+### Streamlit Web App
+
+```bash
+docker run -it -p 8501:8501 --env-file .env bedrock-llm streamlit run streamlit_app.py
+```
+
+Access at `http://localhost:8501`
+
+---
+
+### CLI Version
 
 ```bash
 cd docker
 docker compose up --build
-```
-
-### Interactive Mode
-
-```bash
 docker exec -it llm_data_agent python src/main.py
 ```
 
@@ -107,9 +135,69 @@ docker build -f docker/Dockerfile -t bedrock-llm .
 docker run -it --env-file .env bedrock-llm
 ```
 
+---
+
+## 🚀 Deploy to Cloud
+
+### Deploy to Streamlit Cloud (FREE!)
+
+1. **Push to GitHub** (already done ✅)
+
+2. **Go to** [share.streamlit.io](https://share.streamlit.io)
+
+3. **Click "New app"**
+
+4. **Select your repo**: `Echeverri222/bedrock-llm`
+
+5. **Set main file**: `streamlit_app.py`
+
+6. **Add secrets** (click Advanced settings → Secrets):
+   ```toml
+   AWS_ACCESS_KEY_ID = "your_key"
+   AWS_SECRET_ACCESS_KEY = "your_secret"
+   AWS_REGION = "sa-east-1"
+   S3_BUCKET_NAME = "your_bucket"
+   BEDROCK_REGION = "us-east-1"
+   BEDROCK_MODEL = "cohere.command-r-plus-v1:0"
+   ```
+
+7. **Click Deploy!** 🚀
+
+Your app will be live at `https://yourusername-bedrock-llm.streamlit.app`
+
+---
+
+### Deploy to Railway (Alternative)
+
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
+
+# Login and deploy
+railway login
+railway init
+railway up
+```
+
+Add environment variables in Railway dashboard.
+
 ## 💬 Usage Examples
 
-Once running, you can ask questions like:
+### Web Interface
+
+Simply type your questions in the chat box:
+
+```
+¿Cuántos estudios hay en total?
+Show me studies from July
+What are the most common findings?
+```
+
+The assistant will automatically use the right tools to answer!
+
+---
+
+### CLI Interface
 
 ```
 You: ¿Cuántos estudios hay en total?
@@ -122,24 +210,26 @@ You: What are the most common findings?
 Agent: Based on the analysis... [summary]
 ```
 
-### Commands
-
+**Commands:**
 - Type your question to interact with the data
-- `reset` - Clear conversation history
-- `quit` or `exit` - End the session
+- `reset` - Clear conversation history (CLI only)
+- `quit` or `exit` - End the session (CLI only)
 
 ## 🛠️ Project Structure
 
 ```
 bedrock-llm/
+├── streamlit_app.py          # 🌐 Web interface (START HERE!)
 ├── src/                      # Source code
-│   ├── main.py              # Main application entry point
+│   ├── main.py              # CLI application entry point
 │   ├── agents/              # AI agents
 │   │   ├── bedrock_agent.py # AWS Bedrock agent
 │   │   └── llm_agent.py     # OpenAI agent
 │   └── tools/               # Utility tools
 │       ├── s3_loader.py     # S3 data loader
 │       └── file_tools.py    # File processing
+├── .streamlit/               # Streamlit configuration
+│   └── config.toml          # Theme and settings
 ├── docker/                   # Docker files
 │   ├── Dockerfile           # Docker configuration
 │   └── docker-compose.yml   # Docker Compose
