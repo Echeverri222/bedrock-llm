@@ -2,10 +2,11 @@
 
 An intelligent AI agent that reads medical data from AWS S3 buckets and answers questions using AWS Bedrock (Cohere Command R+) with function calling capabilities.
 
-## 🎯 Two Deployment Options
+## 🎯 Architecture Overview
 
-1. **🔒 Secure REST API** (Recommended for production) - Token-based authentication, perfect for integrations
-2. **🌐 Web App** - Beautiful Streamlit UI with chat interface
+**Core API**: Secure REST API with Bearer token authentication for production use
+
+**Documentation Interface**: Interactive Streamlit UI for API testing and documentation
 
 ## 🌟 Features
 
@@ -17,17 +18,19 @@ An intelligent AI agent that reads medical data from AWS S3 buckets and answers 
 - 💰 **Token Tracking**: Monitor usage and costs in real-time
 - 🏥 **Medical Data Focus**: Specialized for Doppler ultrasound studies
 
-### API Mode (Secure)
+### API Features
 - 🔐 **Token Authentication**: Bearer token security (like DevRev API)
 - 📡 **REST API**: Easy integration with any application
-- 📚 **Auto Documentation**: Interactive Swagger/OpenAPI docs
+- 📚 **Auto Documentation**: Interactive Swagger/OpenAPI docs at `/docs`
 - 🚀 **Production Ready**: FastAPI with uvicorn
+- 🔒 **Private & Secure**: No public access without valid token
 
-### Web App Mode
-- 🌐 **Browser Interface**: Beautiful Streamlit UI
-- 💬 **Chat Interface**: Conversational data analysis
-- 🎨 **Custom Theme**: Professional design
-- ☁️ **Cloud Deploy**: Easy deployment to Streamlit Cloud
+### Documentation Interface (Streamlit)
+- 📖 **Interactive Docs**: Visual API documentation
+- 🧪 **API Tester**: Test endpoints with your token
+- 💻 **Code Examples**: cURL, Python, JavaScript, PHP, Go
+- 🎨 **Professional UI**: Clean, organized interface
+- 🔑 **Token Management**: Easy token configuration
 
 ## 🏗️ Architecture
 
@@ -92,14 +95,16 @@ curl -X POST "http://localhost:8000/api/query" \
 
 ---
 
-### Option B: Web App Interface 🌐
+### Option B: API Documentation Interface 📖
 
-**Best for:** Quick analysis, visual interface, demos
+**Best for:** Learning the API, testing endpoints, viewing examples
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/Echeverri222/bedrock-llm.git
-cd bedrock-llm
+# 1. Start the API first (required)
+./run_api.sh  # Mac/Linux
+
+# 2. In a new terminal, start the documentation interface
+streamlit run streamlit_app.py
 
 ### 2. Set Up Environment
 
@@ -192,7 +197,9 @@ docker run -it --env-file .env bedrock-llm
 
 ## 🚀 Deploy to Cloud
 
-### Deploy to Streamlit Cloud (FREE!)
+### Deploy Documentation Interface to Streamlit Cloud
+
+Deploy the interactive API documentation interface to Streamlit Cloud:
 
 1. **Push to GitHub** (already done ✅)
 
@@ -206,78 +213,95 @@ docker run -it --env-file .env bedrock-llm
 
 6. **Add secrets** (click Advanced settings → Secrets):
    ```toml
-   AWS_ACCESS_KEY_ID = "your_key"
-   AWS_SECRET_ACCESS_KEY = "your_secret"
-   AWS_REGION = "sa-east-1"
-   S3_BUCKET_NAME = "your_bucket"
-   BEDROCK_REGION = "us-east-1"
-   BEDROCK_MODEL = "cohere.command-r-plus-v1:0"
+   # Only needed if you want the docs to connect to a remote API
+   API_URL = "https://your-api-domain.com"
    ```
 
 7. **Click Deploy!** 🚀
 
-Your app will be live at `https://yourusername-bedrock-llm.streamlit.app`
+Your documentation interface will be live at `https://yourusername-bedrock-llm.streamlit.app`
+
+**Note:** This deploys only the documentation interface. Your actual API should be deployed separately (AWS EC2, ECS, etc.)
 
 ---
 
-### Deploy to Railway (Alternative)
+### Deploy API to Production
 
+For the actual API (not the docs), deploy to:
+
+**AWS EC2/ECS:**
 ```bash
-# Install Railway CLI
-npm install -g @railway/cli
+# Install dependencies
+pip install -r requirements.txt
 
-# Login and deploy
+# Run with gunicorn
+pip install gunicorn
+gunicorn -w 4 -k uvicorn.workers.UvicornWorker api:app --bind 0.0.0.0:8000
+```
+
+**Docker:**
+```bash
+docker build -t medical-api -f docker/Dockerfile .
+docker run -p 8000:8000 --env-file .env medical-api
+```
+
+**Railway:**
+```bash
 railway login
 railway init
 railway up
 ```
 
-Add environment variables in Railway dashboard.
+Set environment variables (including `API_TOKEN`) in your deployment platform.
 
 ## 💬 Usage Examples
 
-### Web Interface
+### REST API
 
-Simply type your questions in the chat box:
+**With cURL:**
 
+```bash
+curl -X POST "http://localhost:8000/api/query" \
+     -H "Authorization: Bearer YOUR_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{"question": "¿Cuántos estudios hay en total?"}'
 ```
-¿Cuántos estudios hay en total?
-Show me studies from July
-What are the most common findings?
-```
 
-The assistant will automatically use the right tools to answer!
+**With Python:**
+
+```python
+import requests
+
+response = requests.post(
+    "http://localhost:8000/api/query",
+    headers={"Authorization": "Bearer YOUR_TOKEN"},
+    json={"question": "What was the most expensive study?"}
+)
+print(response.json())
+```
 
 ---
 
-### CLI Interface
+### Documentation Interface
 
-```
-You: ¿Cuántos estudios hay en total?
-Agent: Según los datos del archivo Excel, hay 145 estudios Doppler en total...
+Use the Streamlit interface to:
+1. **Browse endpoints** - See all available API endpoints
+2. **Test API calls** - Make requests with your token
+3. **View examples** - Get code in multiple languages
+4. **Learn the API** - Interactive documentation
 
-You: Show me studies from July
-Agent: Filtering the data for July... [results]
-
-You: What are the most common findings?
-Agent: Based on the analysis... [summary]
-```
-
-**Commands:**
-- Type your question to interact with the data
-- `reset` - Clear conversation history (CLI only)
-- `quit` or `exit` - End the session (CLI only)
+**Access:** `http://localhost:8501` (after running `streamlit run streamlit_app.py`)
 
 ## 🛠️ Project Structure
 
 ```
 bedrock-llm/
-├── streamlit_app.py          # 🌐 Web interface (START HERE!)
+├── api.py                    # 🔒 REST API (PRODUCTION)
+├── streamlit_app.py          # 📖 API Documentation Interface
 ├── src/                      # Source code
 │   ├── main.py              # CLI application entry point
 │   ├── agents/              # AI agents
-│   │   ├── bedrock_agent.py # AWS Bedrock agent
-│   │   └── llm_agent.py     # OpenAI agent
+│   │   └── bedrock_agent.py # AWS Bedrock agent
 │   └── tools/               # Utility tools
 │       ├── s3_loader.py     # S3 data loader
 │       └── file_tools.py    # File processing
@@ -287,14 +311,15 @@ bedrock-llm/
 │   ├── Dockerfile           # Docker configuration
 │   └── docker-compose.yml   # Docker Compose
 ├── docs/                     # Documentation
+│   ├── API_DOCUMENTATION.md # Full API reference
+│   ├── API_QUICKSTART.md    # Quick API guide
 │   └── BEDROCK_SETUP.md     # Bedrock setup guide
 ├── config/                   # Configuration files
 │   └── env.example          # Environment template
 ├── data/                     # Data cache (auto-created)
-├── run.sh                    # Run script (Mac/Linux)
-├── run.bat                   # Run script (Windows)
+├── run_api.sh / run_api.bat  # API startup scripts
+├── test_api.sh              # API testing script
 ├── requirements.txt          # Python dependencies
-├── .gitignore               # Git ignore rules
 └── README.md                # This file
 ```
 
