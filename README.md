@@ -2,19 +2,32 @@
 
 An intelligent AI agent that reads medical data from AWS S3 buckets and answers questions using AWS Bedrock (Cohere Command R+) with function calling capabilities.
 
-🌐 **Now available as a Web App!** Run with Streamlit for a beautiful browser interface.
+## 🎯 Two Deployment Options
+
+1. **🔒 Secure REST API** (Recommended for production) - Token-based authentication, perfect for integrations
+2. **🌐 Web App** - Beautiful Streamlit UI with chat interface
 
 ## 🌟 Features
 
-- 🌐 **Web Interface**: Beautiful Streamlit UI with chat interface
+### Core Features
 - 📊 **Excel File Analysis**: Read and analyze Excel files from S3
 - 🤖 **AWS Bedrock Integration**: Uses Cohere Command R+ with function calling
 - ☁️ **AWS S3 Integration**: Automatically downloads and caches files
-- 💬 **Interactive Chat**: Natural language interface for data analysis
-- 🐳 **Docker Ready**: Easy deployment with Docker
+- 💬 **Natural Language Interface**: Ask questions in English or Spanish
 - 💰 **Token Tracking**: Monitor usage and costs in real-time
 - 🏥 **Medical Data Focus**: Specialized for Doppler ultrasound studies
-- 🎨 **Custom Theme**: Professional UI design
+
+### API Mode (Secure)
+- 🔐 **Token Authentication**: Bearer token security (like DevRev API)
+- 📡 **REST API**: Easy integration with any application
+- 📚 **Auto Documentation**: Interactive Swagger/OpenAPI docs
+- 🚀 **Production Ready**: FastAPI with uvicorn
+
+### Web App Mode
+- 🌐 **Browser Interface**: Beautiful Streamlit UI
+- 💬 **Chat Interface**: Conversational data analysis
+- 🎨 **Custom Theme**: Professional design
+- ☁️ **Cloud Deploy**: Easy deployment to Streamlit Cloud
 
 ## 🏗️ Architecture
 
@@ -41,12 +54,52 @@ An intelligent AI agent that reads medical data from AWS S3 buckets and answers 
 
 ## 🚀 Quick Start
 
-### 1. Clone the Repository
+### Option A: Secure REST API (Recommended) 🔒
+
+**Best for:** Production use, integrations, keeping data private
 
 ```bash
+# 1. Clone the repository
 git clone https://github.com/Echeverri222/bedrock-llm.git
 cd bedrock-llm
+
+# 2. Generate API token
+openssl rand -hex 32
+
+# 3. Configure .env (add your token)
+cp config/env.example .env
+# Edit .env with your AWS credentials and API_TOKEN
+
+# 4. Run the API
+./run_api.sh  # Mac/Linux
+# or
+run_api.bat  # Windows
 ```
+
+**Access:**
+- API: `http://localhost:8000`
+- Docs: `http://localhost:8000/docs`
+
+**Quick test:**
+```bash
+curl -X POST "http://localhost:8000/api/query" \
+     -H "Authorization: Bearer YOUR_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{"question": "¿Cuántos estudios hay?"}'
+```
+
+📖 **Full API Documentation:** See [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md)
+
+---
+
+### Option B: Web App Interface 🌐
+
+**Best for:** Quick analysis, visual interface, demos
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Echeverri222/bedrock-llm.git
+cd bedrock-llm
 
 ### 2. Set Up Environment
 
