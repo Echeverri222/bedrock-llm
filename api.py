@@ -117,14 +117,14 @@ def initialize_services():
                 local_files[file_key] = local_path
                 logger.info(f"✅ Downloaded: {file_key}")
         
-        # Initialize Bedrock agent with local file paths
+        # Initialize Bedrock agent
         agent = BedrockAgent(
-            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
             aws_region=os.getenv('BEDROCK_REGION'),
-            model_id=os.getenv('BEDROCK_MODEL'),
-            local_files=list(local_files.values())
+            model_id=os.getenv('BEDROCK_MODEL')
         )
+        
+        # Set available files for the agent
+        agent.set_available_files(list(local_files.values()))
         
         logger.info("✅ Services initialized successfully")
         
