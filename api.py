@@ -99,10 +99,10 @@ def initialize_services():
         
         # Initialize S3 loader
         s3_loader = S3DataLoader(
+            bucket_name=os.getenv('S3_BUCKET_NAME'),
             aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
             aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
-            aws_region=os.getenv('AWS_REGION'),
-            bucket_name=os.getenv('S3_BUCKET_NAME')
+            region_name=os.getenv('AWS_REGION')
         )
         
         # Download files from S3
@@ -301,7 +301,7 @@ if __name__ == "__main__":
         "api:app",
         host="0.0.0.0",
         port=port,
-        reload=True,
+        reload=False,  # Disable auto-reload to prevent reload loops
         log_level="info"
     )
 
