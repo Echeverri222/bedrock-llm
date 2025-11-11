@@ -73,9 +73,10 @@ st.markdown("""
 
 # Initialize session state
 if 'api_url' not in st.session_state:
-    st.session_state.api_url = os.getenv('API_URL', 'http://localhost:8000')
+    # Use production Railway URL by default, fallback to localhost for local development
+    st.session_state.api_url = os.getenv('API_URL', 'https://web-production-a2ec4d.up.railway.app')
 if 'api_token' not in st.session_state:
-    st.session_state.api_token = ""
+    st.session_state.api_token = os.getenv('API_TOKEN', "")
 
 # Sidebar - API Configuration
 with st.sidebar:
@@ -107,9 +108,21 @@ with st.sidebar:
     
     # Quick links
     st.markdown("### 📚 Quick Links")
-    st.markdown(f"- [Interactive Swagger Docs]({st.session_state.api_url}/docs)")
+    st.markdown(f"- [Live API Docs]({st.session_state.api_url}/docs)")
     st.markdown(f"- [ReDoc Documentation]({st.session_state.api_url}/redoc)")
     st.markdown("- [GitHub Repository](https://github.com/Echeverri222/bedrock-llm)")
+    st.markdown("- [Railway Dashboard](https://railway.app)")
+    
+    st.markdown("---")
+    
+    # API Status
+    st.markdown("### 🚀 API Status")
+    if "railway.app" in st.session_state.api_url:
+        st.success("🌐 Production API (Railway)")
+        st.caption(st.session_state.api_url)
+    else:
+        st.info("💻 Local Development API")
+        st.caption(st.session_state.api_url)
     
     st.markdown("---")
     

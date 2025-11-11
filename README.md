@@ -8,6 +8,12 @@ An intelligent AI agent that reads medical data from AWS S3 buckets and answers 
 
 **Documentation Interface**: Interactive Streamlit UI for API testing and documentation
 
+## 🌐 Live Demo
+
+- **🔒 Production API**: https://web-production-a2ec4d.up.railway.app
+- **📖 API Documentation**: https://web-production-a2ec4d.up.railway.app/docs
+- **📱 Interactive Docs**: https://echeverri222-bedrock-llm.streamlit.app *(coming soon)*
+
 ## 🌟 Features
 
 ### Core Features
@@ -80,12 +86,12 @@ run_api.bat  # Windows
 ```
 
 **Access:**
-- API: `http://localhost:8000`
-- Docs: `http://localhost:8000/docs`
+- API: `http://localhost:8000` (local) or `https://web-production-a2ec4d.up.railway.app` (production)
+- Docs: `http://localhost:8000/docs` or `https://web-production-a2ec4d.up.railway.app/docs`
 
-**Quick test:**
+**Quick test (Production):**
 ```bash
-curl -X POST "http://localhost:8000/api/query" \
+curl -X POST "https://web-production-a2ec4d.up.railway.app/api/query" \
      -H "Authorization: Bearer YOUR_TOKEN" \
      -H "Content-Type: application/json" \
      -d '{"question": "¿Cuántos estudios hay?"}'
